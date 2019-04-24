@@ -51,22 +51,30 @@ function resetDatabase() {
 
 function deployPlayer() {
     var userName = $("#nameInput").val().trim();
-
+    console.log(users.user1.name);
+    console.log(users.user2.name);
     if (users.user1.name === "") {
         users.user1.name = userName;
         userId = 1;
         if (users.user2.name !== "") {
             users.userTurn = 1;
         }
+        $("#msg-input").removeAttr("disabled");
+        $("#add-msg").removeAttr("disabled");
+        $(".user1namespace").html("<p>" + userName + "</p>");
+        $(".welcome").html("<p>Hi " + userName + ". You are player " + userId + "</p>");
     } else if (users.user2.name === "") {
         users.user2.name = userName;
         userId = 2;
         users.userTurn = 1;
+        $("#msg-input").removeAttr("disabled");
+        $("#add-msg").removeAttr("disabled");
+        $(".user1namespace").html("<p>" + userName + "</p>");
+        $(".welcome").html("<p>Hi " + userName + ". You are player " + userId + "</p>");
     } else {
-        console.log("Players slot full");
+        alert("Players slot full");
     }
-    $(".user1namespace").html("<p>" + userName + "</p>");
-    $("#nameInput").html("<p>Hi " + userName + ". You are player # " + userId + "</p>");
+    $("#nameInput").remove();
     $("#add-player").remove();
     updateDatabase();
 }

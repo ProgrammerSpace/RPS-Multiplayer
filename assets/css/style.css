@@ -4,3 +4,6 @@
 .message {
     line-height: 100px;
 }
+.border-success {
+    background-color: lightgreen;
+}
