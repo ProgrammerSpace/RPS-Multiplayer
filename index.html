@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- For Glyphicon Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <!-- css -->
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.2.3.js"
+        integrity="sha256-laXWtGydpwqJ8JA+X9x2miwmaiKhn8tVmOVEigRNtP4=" crossorigin="anonymous"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Rock Paper Scissor</h1>
+                <div class="col-md-12">
+                    <input id="nameInput" type="text" placeholder="Name">
+                    <button id="add-player" class="btn btn-primary">Start</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-3 border m-2 user1">
+                <div class="user1namespace">Waiting for player 1</div>
+                <div class="user1choices">
+                    <button id="user1-rock" class="btn btn-lg choice" disabled>Rock</button><br>
+                    <button id="user1-paper" class="btn btn-lg choice" disabled>Paper</button><br>
+                    <button id="user1-scissors" class="btn btn-lg choice" disabled>Scissors</button><br>
+                    <p id="user1-score"></p>
+                </div>
+            </div>
+            <div class="col-5 border m-2 result">play</div>
+            <div class="col-3 border m-2 user2">
+                <div class="user2namespace">Waiting for player 2</div>
+                <div class="user2choices">
+                    <button id="user2-rock" class="btn btn-lg choice" disabled>Rock</button><br>
+                    <button id="user2-paper" class="btn btn-lg choice" disabled>Paper</button><br>
+                    <button id="user2-scissors" class="btn btn-lg choice" disabled>Scissors</button><br>
+                    <p id="user2-score"></p>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5 border m-2 message">
+                message
+            </div>
+            <form role="form">
+                <div class="form-group">
+                    <label for="msg-input">Send message:</label>
+                    <input class="form-control" id="msg-input" type="text">
+                </div>
+                <button class="btn btn-default" id="add-msg" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="assets/javascript/game.js"></script>
+</body>
+
+</html>
