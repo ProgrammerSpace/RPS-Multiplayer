@@ -33,8 +33,8 @@ function resetDatabase() {
         database.ref("userTurn").set(0);
         database.ref("userWon").set(-1);
         database.ref("messages").set("");
-        $(".user1").removeClass("border-danger");
-        $(".user2").removeClass("border-danger");
+        $(".user1").removeClass("border-success");
+        $(".user2").removeClass("border-success");
     } else if (userId === 2) {
         database.ref("user2/name").set("");
         database.ref("user2/userChoice").set("");
@@ -44,8 +44,8 @@ function resetDatabase() {
         database.ref("userTurn").set(0);
         database.ref("userWon").set(-1);
         database.ref("messages").set("");
-        $(".user1").removeClass("border-danger");
-        $(".user2").removeClass("border-danger");
+        $(".user1").removeClass("border-success");
+        $(".user2").removeClass("border-success");
     }
 }
 
@@ -172,8 +172,8 @@ database.ref().on("value", function (snapshot) {
 database.ref("userTurn").on("value", function (snapshot) {
     users.userTurn = snapshot.val();
     if (users.userTurn === 1) {
-        $(".user1").addClass("border-danger");
-        $(".user2").removeClass("border-danger");
+        $(".user1").addClass("border-success");
+        $(".user2").removeClass("border-success");
         if (userId === 2) {
             $(".result").text("Waiting for player 1 to pick!");
             switchControl(userId, false);
@@ -182,8 +182,8 @@ database.ref("userTurn").on("value", function (snapshot) {
             switchControl(userId, true);
         }
     } else if (users.userTurn === 2) {
-        $(".user2").addClass("border-danger");
-        $(".user1").removeClass("border-danger");
+        $(".user2").addClass("border-success");
+        $(".user1").removeClass("border-success");
         if (userId === 1) {
             $(".result").text("Waiting for player 2 to pick!");
             switchControl(userId, false);
