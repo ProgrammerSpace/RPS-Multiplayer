@@ -164,10 +164,20 @@ database.ref().on("value", function (snapshot) {
         if (users.user1.name !== "") {
             $(".user1namespace").text(users.user1.name);
             $("#user1-score").text("Wins: " + users.user1.wins + " | Losses: " + users.user1.losses + " | Ties: " + users.user1.ties);
+        } else {
+            $(".user1namespace").text("Waiting for player 1");
+            $("#user1-score").text("");
+            $(".user1").removeClass("border-success");
+            $(".user2").removeClass("border-success");
         }
         if (users.user2.name !== "") {
             $(".user2namespace").text(users.user2.name);
             $("#user2-score").text("Wins: " + users.user2.wins + " | Losses: " + users.user2.losses + " | Ties: " + users.user2.ties);
+        } else {
+            $(".user2namespace").text("Waiting for player 2");
+            $("#user2-score").text("");
+            $(".user2").removeClass("border-success");
+            $(".user1").removeClass("border-success");
         }
         if (userId === 1) {
             switchControl(2, false);
