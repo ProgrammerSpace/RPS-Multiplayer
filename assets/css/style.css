@@ -2,7 +2,8 @@
     text-align: center;
   }
 .message {
-    line-height: 100px;
+    max-height: 100px;
+    overflow-y: scroll;
 }
 .border-success {
     background-color: lightgreen;

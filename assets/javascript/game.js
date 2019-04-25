@@ -1,4 +1,4 @@
-var userId = 0;
+var userId = 0, gameOn = false;
 var user1 = { name: "", userChoice: "", wins: 0, losses: 0, ties: 0 };
 var user2 = { name: "", userChoice: "", wins: 0, losses: 0, ties: 0 };
 var users = { user1, user2, userTurn: 0, userWon: -1 };
@@ -56,6 +56,7 @@ function deployPlayer() {
     if (users.user1.name === "") {
         users.user1.name = userName;
         userId = 1;
+        gameOn = true;
         if (users.user2.name !== "") {
             users.userTurn = 1;
         }
@@ -66,6 +67,7 @@ function deployPlayer() {
     } else if (users.user2.name === "") {
         users.user2.name = userName;
         userId = 2;
+        gameOn = true;
         users.userTurn = 1;
         $("#msg-input").removeAttr("disabled");
         $("#add-msg").removeAttr("disabled");
@@ -132,6 +134,18 @@ function whoWins() {
         console.log("user2: " + users.user2.wins + " " + users.user2.losses + " " + users.user2.ties);
         updateDatabase();
     }
+}
+
+function updateMessage() {
+    event.preventDefault();
+    var userNameTag = "user" + userId;
+    var message = $("#msg-input").val().trim();
+    database.ref("messages").push({
+        userNameTag: userNameTag,
+        message: message,
+        time: firebase.database.ServerValue.TIMESTAMP
+    });
+    $("#msg-input").val("");
 }
 
 function switchControl(player, enable) {
@@ -248,13 +262,32 @@ database.ref("userWon").on("value", function (snapshot) {
     }
 }, errorHanlder);
 
+database.ref("messages").on("child_added", function (snapshot) {
+    var newMsg = snapshot.val();
+    var msg = $("<div>");
+    var usrName;
+    let n = snapshot.val().userNameTag;
+    if (n === "user1") {
+        usrName = users.user1.name;
+    } else if (n === "user2") {
+        usrName = users.user2.name;
+    }
+    var msgTxt = $("<p>");
+    msgTxt.html("<b><i>" + usrName + ": </b></i>" + newMsg.message);
+
+    msg.append(msgTxt);
+    if (gameOn) {
+        $(".message").append(msg);
+    }
+
+}, errorHanlder);
+
 function errorHanlder(errorObj) {
     console.log(errorObj);
 }
 
 $(document).ready(function () {
-
     $("#add-player").on("click", deployPlayer);
     $(".choice").on('click', getUserChoice);
-
+    $("#add-msg").on("click", updateMessage);
 });
