@@ -33,7 +33,7 @@
 
         </div>
         <div class="row">
-            <div class="col-3 border m-2 user1">
+            <div class="col-3 border m-2 p-2 user1">
                 <div class="user1namespace">Waiting for player 1</div>
                 <div class="user1choices">
                     <button id="user1-rock" class="btn btn-lg choice" disabled>Rock</button><br>
@@ -42,8 +42,8 @@
                     <p id="user1-score"></p>
                 </div>
             </div>
-            <div class="col-5 border m-2 result">play</div>
-            <div class="col-3 border m-2 user2">
+            <div class="col-5 border m-2 result"></div>
+            <div class="col-3 border m-2 p-2 user2">
                 <div class="user2namespace">Waiting for player 2</div>
                 <div class="user2choices">
                     <button id="user2-rock" class="btn btn-lg choice" disabled>Rock</button><br>
@@ -55,15 +55,15 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-5 border m-2 message">
-            </div>
-            <form role="form">
-                <div class="form-group">
-                    <label for="msg-input">Send message:</label>
-                    <input class="form-control" id="msg-input" type="text" disabled>
+            <div class="col-5 offset-3">
+                <div id="msgBox" class="m-2 border message p-3">
                 </div>
-                <button class="btn btn-default" id="add-msg" type="submit" disabled>Send</button>
-            </form>
+                <form>
+                    <input class="form-control" id="msg-input" type="text" disabled placeholder="Type your message">
+
+                    <button class="btn btn-default" id="add-msg" type="submit" disabled>Send</button>
+                </form>
+            </div>
         </div>
     </div>
     <script type="text/javascript" src="assets/javascript/game.js"></script>

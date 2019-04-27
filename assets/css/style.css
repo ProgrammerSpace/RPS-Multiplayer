@@ -1,10 +1,24 @@
-* {
+body {
+    background-image: url("../images/bg.png");
+    font-size: 16px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+h1, .welcome, .user1, .user2, .result {
     text-align: center;
   }
 .message {
-    max-height: 100px;
+    height: 150px;
     overflow-y: scroll;
+    color: white;
 }
-.border-success {
-    background-color: lightgreen;
+.border-warning {
+    background-color: bisque;
+}
+.result {
+    font-weight: bolder;
+    font-size: 20px;
+    color: white;
+}
+#add-msg {
+    display: none;
 }

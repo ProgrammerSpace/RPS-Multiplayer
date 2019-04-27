@@ -1,7 +1,8 @@
 var userId = 0, gameOn = false;
 var user1 = { name: "", userChoice: "", wins: 0, losses: 0, ties: 0 };
 var user2 = { name: "", userChoice: "", wins: 0, losses: 0, ties: 0 };
-var users = { user1, user2, userTurn: 0, userWon: -1 };
+var users = { user1, user2, userTurn: 0, userWon: -1, winningImage: "" };
+var r = false, p = false, s = false;
 
 var config = {
     apiKey: "AIzaSyAGVetKXqXYxfGO0Xrjk1ep4Eeat2hmPT8",
@@ -33,8 +34,9 @@ function resetDatabase() {
         database.ref("userTurn").set(0);
         database.ref("userWon").set(-1);
         database.ref("messages").set("");
-        $(".user1").removeClass("border-success");
-        $(".user2").removeClass("border-success");
+        database.ref("winningImage").set("");
+        $(".user1").removeClass("border-warning");
+        $(".user2").removeClass("border-warning");
     } else if (userId === 2) {
         database.ref("user2/name").set("");
         database.ref("user2/userChoice").set("");
@@ -44,8 +46,9 @@ function resetDatabase() {
         database.ref("userTurn").set(0);
         database.ref("userWon").set(-1);
         database.ref("messages").set("");
-        $(".user1").removeClass("border-success");
-        $(".user2").removeClass("border-success");
+        database.ref("winningImage").set("");
+        $(".user1").removeClass("border-warning");
+        $(".user2").removeClass("border-warning");
     }
 }
 
@@ -112,6 +115,42 @@ function whoWins() {
 
     console.log(user1Choice);
     console.log(user2Choice);
+    if (user1Choice == "Rock" || user2Choice == "Rock") {
+        r = true;
+    }
+    if (user1Choice == "Scissors" || user2Choice == "Scissors") {
+        s = true;
+    }
+    if (user1Choice == "Paper" || user2Choice == "Paper") {
+        p = true;
+    }
+
+    if (r && p) {
+        // winningImage = "paper.jpg";
+        database.ref("winningImage").set("paper.jpg");
+        r = false;
+        p = false;
+        s = false;
+    } else if (r && s) {
+        // winningImage = "stone.jpg";
+        database.ref("winningImage").set("stone.jpg");
+        r = false;
+        p = false;
+        s = false;
+    }
+    else if (p && s) {
+        // winningImage = "scissors.jpg";
+        database.ref("winningImage").set("scissors.jpg");
+        r = false;
+        p = false;
+        s = false;
+    } else {
+        // winningImage = "rps.png";
+        database.ref("winningImage").set("rps.png");
+        r = false;
+        p = false;
+        s = false;
+    }
 
     if (user1Choice != "" && user2Choice != "") {
         if ((user1Choice === "Rock" && user2Choice === "Scissors") ||
@@ -140,12 +179,25 @@ function updateMessage() {
     event.preventDefault();
     var userNameTag = "user" + userId;
     var message = $("#msg-input").val().trim();
-    database.ref("messages").push({
-        userNameTag: userNameTag,
-        message: message,
-        time: firebase.database.ServerValue.TIMESTAMP
-    });
+    if (message != "") {
+        database.ref("messages").push({
+            userNameTag: userNameTag,
+            message: message,
+            time: firebase.database.ServerValue.TIMESTAMP
+        });
+    }
     $("#msg-input").val("");
+    updateScroll();
+}
+
+function updateScroll() {
+
+    // Scroll to bottom of div with javascript
+    // var element = document.getElementById("msgBox");
+    // element.scrollTop = element.scrollHeight;
+
+    $('#msgBox').scrollTop($('#msgBox')[0].scrollHeight);
+
 }
 
 function switchControl(player, enable) {
@@ -181,8 +233,8 @@ database.ref().on("value", function (snapshot) {
         } else {
             $(".user1namespace").text("Waiting for player 1");
             $("#user1-score").text("");
-            $(".user1").removeClass("border-success");
-            $(".user2").removeClass("border-success");
+            $(".user1").removeClass("border-warning");
+            $(".user2").removeClass("border-warning");
         }
         if (users.user2.name !== "") {
             $(".user2namespace").text(users.user2.name);
@@ -190,8 +242,8 @@ database.ref().on("value", function (snapshot) {
         } else {
             $(".user2namespace").text("Waiting for player 2");
             $("#user2-score").text("");
-            $(".user2").removeClass("border-success");
-            $(".user1").removeClass("border-success");
+            $(".user2").removeClass("border-warning");
+            $(".user1").removeClass("border-warning");
         }
         if (userId === 1) {
             switchControl(2, false);
@@ -204,8 +256,8 @@ database.ref().on("value", function (snapshot) {
 database.ref("userTurn").on("value", function (snapshot) {
     users.userTurn = snapshot.val();
     if (users.userTurn === 1) {
-        $(".user1").addClass("border-success");
-        $(".user2").removeClass("border-success");
+        $(".user1").addClass("border-warning");
+        $(".user2").removeClass("border-warning");
         if (userId === 2) {
             $(".result").text("Waiting for player 1 to pick!");
             switchControl(userId, false);
@@ -214,8 +266,8 @@ database.ref("userTurn").on("value", function (snapshot) {
             switchControl(userId, true);
         }
     } else if (users.userTurn === 2) {
-        $(".user2").addClass("border-success");
-        $(".user1").removeClass("border-success");
+        $(".user2").addClass("border-warning");
+        $(".user1").removeClass("border-warning");
         if (userId === 1) {
             $(".result").text("Waiting for player 2 to pick!");
             switchControl(userId, false);
@@ -228,10 +280,20 @@ database.ref("userTurn").on("value", function (snapshot) {
 
 database.ref("userWon").on("value", function (snapshot) {
     var winner = snapshot.val();
+
+    database.ref("winningImage").on("value", function (snapshot) {
+        resImg = snapshot.val();
+    });
+
+    let winningImg = $("<img>");
+    winningImg.attr("width", "150");
+    winningImg.attr("height", "125");
+    winningImg.attr("src", "assets/images/" + resImg);
+
     if (winner !== null && winner !== "") {
         if (winner === 1) {
-            $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "<p>");
-            $(".result").append(users.user1.name + " wins!!");
+            $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "</p><p>" + users.user1.name + " wins!!</p>");
+            $(".result").append(winningImg);
             $("#user1-score").text("Wins: " + users.user1.wins + " | Losses: " + users.user1.losses + " | Ties: " + users.user1.ties);
             $("#user2-score").text("Wins: " + users.user2.wins + " | Losses: " + users.user2.losses + " | Ties: " + users.user2.ties);
             setTimeout(function () {
@@ -239,8 +301,8 @@ database.ref("userWon").on("value", function (snapshot) {
                 database.ref("userWon").set(-1);
             }, 3000);
         } else if (winner === 2) {
-            $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "<p>");
-            $(".result").append(users.user2.name + " wins!!");
+            $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "</p><p>" + users.user2.name + " wins!!</p>");
+            $(".result").append(winningImg);
             $("#user1-score").text("Wins: " + users.user1.wins + " | Losses: " + users.user1.losses + " | Ties: " + users.user1.ties);
             $("#user2-score").text("Wins: " + users.user2.wins + " | Losses: " + users.user2.losses + " | Ties: " + users.user2.ties);
             setTimeout(function () {
@@ -248,8 +310,8 @@ database.ref("userWon").on("value", function (snapshot) {
                 database.ref("userWon").set(-1);
             }, 3000);
         } else if (winner === 0) {
-            $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "<p>");
-            $(".result").append("It's a tie!!");
+            $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "</p><p>It's a tie!!</p>");
+            $(".result").append(winningImg);
             $("#user1-score").text("Wins: " + users.user1.wins + " | Losses: " + users.user1.losses + " | Ties: " + users.user1.ties);
             $("#user2-score").text("Wins: " + users.user2.wins + " | Losses: " + users.user2.losses + " | Ties: " + users.user2.ties);
             setTimeout(function () {
