@@ -1,9 +1,11 @@
+// Global variables
 var userId = 0, gameOn = false;
 var user1 = { name: "", userChoice: "", wins: 0, losses: 0, ties: 0 };
 var user2 = { name: "", userChoice: "", wins: 0, losses: 0, ties: 0 };
 var users = { user1, user2, userTurn: 0, userWon: -1, winningImage: "" };
 var r = false, p = false, s = false;
 
+// Initialize firebase
 var config = {
     apiKey: "AIzaSyAGVetKXqXYxfGO0Xrjk1ep4Eeat2hmPT8",
     authDomain: "rockpaperscissor-de31e.firebaseapp.com",
@@ -17,13 +19,15 @@ firebase.initializeApp(config);
 
 var database = firebase.database();
 
+// Update database
 function updateDatabase() {
-    console.log("updating database");
     database.ref().set(users);
 }
 
+// When a user leaves game
 window.onbeforeunload = resetDatabase;
 
+// Reset database
 function resetDatabase() {
     if (userId === 1) {
         database.ref("user1/name").set("");
@@ -31,6 +35,9 @@ function resetDatabase() {
         database.ref("user1/losses").set(0);
         database.ref("user1/wins").set(0);
         database.ref("user1/ties").set(0);
+        database.ref("user2/losses").set(0);
+        database.ref("user2/wins").set(0);
+        database.ref("user2/ties").set(0);
         database.ref("userTurn").set(0);
         database.ref("userWon").set(-1);
         database.ref("messages").set("");
@@ -43,6 +50,9 @@ function resetDatabase() {
         database.ref("user2/losses").set(0);
         database.ref("user2/wins").set(0);
         database.ref("user2/ties").set(0);
+        database.ref("user1/losses").set(0);
+        database.ref("user1/wins").set(0);
+        database.ref("user1/ties").set(0);
         database.ref("userTurn").set(0);
         database.ref("userWon").set(-1);
         database.ref("messages").set("");
@@ -52,10 +62,9 @@ function resetDatabase() {
     }
 }
 
+// Initialize game with respect to player
 function deployPlayer() {
     var userName = $("#nameInput").val().trim();
-    console.log(users.user1.name);
-    console.log(users.user2.name);
     if (users.user1.name === "") {
         users.user1.name = userName;
         userId = 1;
@@ -65,6 +74,7 @@ function deployPlayer() {
         }
         $("#msg-input").removeAttr("disabled");
         $("#add-msg").removeAttr("disabled");
+        $("#end-game").removeAttr("disabled");
         $(".user1namespace").html("<p>" + userName + "</p>");
         $(".welcome").html("<p>Hi " + userName + ". You are player " + userId + "</p>");
     } else if (users.user2.name === "") {
@@ -74,6 +84,7 @@ function deployPlayer() {
         users.userTurn = 1;
         $("#msg-input").removeAttr("disabled");
         $("#add-msg").removeAttr("disabled");
+        $("#end-game").removeAttr("disabled");
         $(".user1namespace").html("<p>" + userName + "</p>");
         $(".welcome").html("<p>Hi " + userName + ". You are player " + userId + "</p>");
     } else {
@@ -84,6 +95,7 @@ function deployPlayer() {
     updateDatabase();
 }
 
+// Get user's choice, Store in databse, Switch control for next user to play
 function getUserChoice() {
     if ($(this).attr("id").includes("user1")) {
         users.user1.userChoice = $(this).text();
@@ -95,26 +107,12 @@ function getUserChoice() {
         users.userTurn = 1;
         updateDatabase();
         switchControl(userId, false);
-        console.log("Calling whoWins");
         whoWins();
     }
 }
 
-function whoWins() {
-    console.log("Control in whoWins");
-    var user1Choice;
-    var user2Choice;
-
-    database.ref("user1/userChoice").on("value", function (snapshot) {
-        user1Choice = snapshot.val();
-    });
-
-    database.ref("user2/userChoice").on("value", function (snapshot) {
-        user2Choice = snapshot.val();
-    });
-
-    console.log(user1Choice);
-    console.log(user2Choice);
+// Set image as per result
+function setImage(user1Choice, user2Choice) {
     if (user1Choice == "Rock" || user2Choice == "Rock") {
         r = true;
     }
@@ -126,31 +124,43 @@ function whoWins() {
     }
 
     if (r && p) {
-        // winningImage = "paper.jpg";
         database.ref("winningImage").set("paper.jpg");
         r = false;
         p = false;
         s = false;
     } else if (r && s) {
-        // winningImage = "stone.jpg";
         database.ref("winningImage").set("stone.jpg");
         r = false;
         p = false;
         s = false;
     }
     else if (p && s) {
-        // winningImage = "scissors.jpg";
         database.ref("winningImage").set("scissors.jpg");
         r = false;
         p = false;
         s = false;
     } else {
-        // winningImage = "rps.png";
         database.ref("winningImage").set("rps.png");
         r = false;
         p = false;
         s = false;
     }
+}
+
+// Find winner
+function whoWins() {
+    var user1Choice;
+    var user2Choice;
+
+    database.ref("user1/userChoice").on("value", function (snapshot) {
+        user1Choice = snapshot.val();
+    });
+
+    database.ref("user2/userChoice").on("value", function (snapshot) {
+        user2Choice = snapshot.val();
+    });
+
+    setImage(user1Choice, user2Choice);
 
     if (user1Choice != "" && user2Choice != "") {
         if ((user1Choice === "Rock" && user2Choice === "Scissors") ||
@@ -168,13 +178,11 @@ function whoWins() {
             users.user2.wins++;
             users.userWon = 2;
         }
-        console.log("attempting to update database");
-        console.log("user1: " + users.user1.wins + " " + users.user1.losses + " " + users.user1.ties);
-        console.log("user2: " + users.user2.wins + " " + users.user2.losses + " " + users.user2.ties);
         updateDatabase();
     }
 }
 
+// Store message in database
 function updateMessage() {
     event.preventDefault();
     var userNameTag = "user" + userId;
@@ -190,6 +198,7 @@ function updateMessage() {
     updateScroll();
 }
 
+// Make the chat box scroll stick to bottom
 function updateScroll() {
 
     // Scroll to bottom of div with javascript
@@ -200,6 +209,7 @@ function updateScroll() {
 
 }
 
+// To switch control between users
 function switchControl(player, enable) {
     if (!enable) {
         if (player === 1) {
@@ -224,6 +234,7 @@ function switchControl(player, enable) {
     }
 }
 
+// When user value changes
 database.ref().on("value", function (snapshot) {
     if (snapshot.val() !== null) {
         users = snapshot.val();
@@ -253,6 +264,7 @@ database.ref().on("value", function (snapshot) {
     }
 }, errorHanlder);
 
+// Control switch between users
 database.ref("userTurn").on("value", function (snapshot) {
     users.userTurn = snapshot.val();
     if (users.userTurn === 1) {
@@ -278,6 +290,7 @@ database.ref("userTurn").on("value", function (snapshot) {
     }
 }, errorHanlder);
 
+// Display result
 database.ref("userWon").on("value", function (snapshot) {
     var winner = snapshot.val();
 
@@ -299,7 +312,7 @@ database.ref("userWon").on("value", function (snapshot) {
             setTimeout(function () {
                 $(".result").text("");
                 database.ref("userWon").set(-1);
-            }, 3000);
+            }, 5000);
         } else if (winner === 2) {
             $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "</p><p>" + users.user2.name + " wins!!</p>");
             $(".result").append(winningImg);
@@ -308,7 +321,7 @@ database.ref("userWon").on("value", function (snapshot) {
             setTimeout(function () {
                 $(".result").text("");
                 database.ref("userWon").set(-1);
-            }, 3000);
+            }, 5000);
         } else if (winner === 0) {
             $(".result").html("<p>" + users.user1.userChoice + " VS " + users.user2.userChoice + "</p><p>It's a tie!!</p>");
             $(".result").append(winningImg);
@@ -317,13 +330,14 @@ database.ref("userWon").on("value", function (snapshot) {
             setTimeout(function () {
                 $(".result").text("");
                 database.ref("userWon").set(-1);
-            }, 3000);
+            }, 5000);
         } else {
             $(".result").text("");
         }
     }
 }, errorHanlder);
 
+// Add message to chat box
 database.ref("messages").on("child_added", function (snapshot) {
     var newMsg = snapshot.val();
     var msg = $("<div>");
@@ -344,12 +358,19 @@ database.ref("messages").on("child_added", function (snapshot) {
 
 }, errorHanlder);
 
+// Error handler
 function errorHanlder(errorObj) {
     console.log(errorObj);
 }
 
+// Main routine
 $(document).ready(function () {
     $("#add-player").on("click", deployPlayer);
     $(".choice").on('click', getUserChoice);
     $("#add-msg").on("click", updateMessage);
+    $("#end-game").on("click", function () {
+        resetDatabase();
+        var objWindow = window.open(location.href, "_self");
+        objWindow.close();
+    });
 });
